@@ -1,0 +1,2 @@
+🛑 request to https://prod.us-east-1.appstate.amplifyapp.com/AppState/?appId=d1cwgke9np8b1h failed, reason: Client network socket disconnected before secure TLS connection was established
+
