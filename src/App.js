@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 
 // import API from Amplify library
-import { API } from 'aws-amplify'
+import { API, Auth } from 'aws-amplify'
 
 // import query definition
 import { listPosts } from './graphql/queries'
@@ -17,6 +17,7 @@ function App({ signOut }) {
   const [posts, setPosts] = useState([])
   useEffect(() => {
     fetchPosts();
+    checkUser(); // new function call
   }, []);
   async function fetchPosts() {
     try {
@@ -26,6 +27,12 @@ function App({ signOut }) {
       console.log({ err })
     }
   }
+  async function checkUser() {
+      const user = await Auth.currentAuthenticatedUser();
+      console.log('user: ', user);
+      console.log('user attributes: ', user.attributes);
+  }
+    console.log("Hello World");
   return (
     <div>
       <h1>Hello World</h1>
@@ -41,3 +48,4 @@ function App({ signOut }) {
     </div>
   )
 }
+
