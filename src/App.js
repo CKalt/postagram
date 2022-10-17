@@ -1,51 +1,46 @@
 // src/App.js
 import React, { useState, useEffect } from 'react';
-
-// import API from Amplify library
-import { API, Auth } from 'aws-amplify'
-
-// import query definition
-import { listPosts } from './graphql/queries'
-
-// src/App.js, import the withAuthenticator and AmplifySignOut components
-import { withAuthenticator } from '@aws-amplify/ui-react';
-
-/* src/App.js, change the default export to this: */
-export default withAuthenticator(App)
+import { Storage } from 'aws-amplify'
+import { withAuthenticator } from '@aws-amplify/ui-react'
+import { v4 as uuid } from 'uuid'
 
 function App({ signOut }) {
-  const [posts, setPosts] = useState([])
+  const [images, setImages] = useState([])
   useEffect(() => {
-    fetchPosts();
-    checkUser(); // new function call
-  }, []);
-  async function fetchPosts() {
-    try {
-      const postData = await API.graphql({ query: listPosts });
-      setPosts(postData.data.listPosts.items)
-    } catch (err) {
-      console.log({ err })
-    }
+    fetchImages()
+  }, [])
+  async function fetchImages() {
+    // Fetch list of images from S3
+    let s3images = await Storage.list('')
+    // Get presigned URL for S3 images to display images in app
+    s3images = await Promise.all(s3images.map(async image => {
+      const signedImage = await Storage.get(image.key)
+      return signedImage
+    }))
+    setImages(s3images)
   }
-  async function checkUser() {
-      const user = await Auth.currentAuthenticatedUser();
-      console.log('user: ', user);
-      console.log('user attributes: ', user.attributes);
+  function onChange(e) {
+    if (!e.target.files[0]) return
+    const file = e.target.files[0];
+    // upload the image then fetch and rerender images
+    Storage.put(uuid(), file).then (() => fetchImages())
   }
-    console.log("Hello World");
+
   return (
     <div>
-      <h1>Hello World</h1>
+      <h1>Photo Album</h1>
+      <span>Add new image</span>
+      <input
+        type="file"
+        accept='image/png'
+        onChange={onChange}
+      />
+      <div style={{display: 'flex', flexDirection: 'column'}}>
+      { images.map(image => <img src={image} style={{width: 400, marginBottom: 10}} />) }
+      </div>
       <button onClick={signOut}>Sign out</button>
-      {
-        posts.map(post => (
-          <div key={post.id}>
-            <h3>{post.name}</h3>
-            <p>{post.location}</p>
-          </div>
-        ))
-      }
     </div>
-  )
+  );
 }
 
+export default withAuthenticator(App);
