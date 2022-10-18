@@ -42,5 +42,12 @@
         ]
       }
     }
+  },
+  "storage": {
+    "postagramimages": {
+      "service": "S3",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": []
+    }
   }
 }
