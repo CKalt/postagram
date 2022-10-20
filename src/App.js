@@ -46,7 +46,7 @@ function Router({ signOut }) {
           <div className={contentStyle}>
             <Header />
             <hr className={dividerStyle} />
-            <Button title="New Post" onClick={() => updateOverlayVisibility(true)} />
+            <Button title="New Post Here" onClick={() => updateOverlayVisibility(true)} />
             <Routes>
               <Route path="/" element={<Posts />} />
               <Route path="/post/:id" element={<Post />} />
